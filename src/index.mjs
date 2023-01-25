@@ -36,6 +36,7 @@ let {
   qFile = false,
   qParams,
   log,
+  loop,
 } = minimist(process.argv.slice(2))
 
 /**
@@ -122,7 +123,7 @@ const utImport = async () => {
   )
   //------------------------------------------------------
   const utConnector = new UtConnector({}, output)
-  await utConnector.getDataToCsv(query, qParams)
+  await utConnector.getDataToCsv(query, qParams, loop)
 }
 
 if (node && (filePath || query || qFile)) {

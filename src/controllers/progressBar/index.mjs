@@ -1,42 +1,42 @@
-import cliProgress from 'cli-progress'
-import logUpdate from 'log-update'
+// #region imports
+import { Presets } from 'cli-progress'
+import MultiBar from '../../../node_modules/cli-progress/lib/multi-bar.js'
+import Spinner from './spinner.mjs'
 import colors from 'ansi-colors'
+// #endregion
 
-class MyProgress extends cliProgress.SingleBar {
+/**
+ * JSDoc style
+ * @typedef {object} spOptions
+ * @property {string} frame
+ * @property {string} message
+ * @property {boolean} [showTimer]
+ */
+
+class MyProgress extends MultiBar {
   constructor(opt, preset) {
     super(opt, preset)
-    this.logUpdate = logUpdate
   }
 
-  spinner() {
-    let spinner
-    const start = (message) => {
-      const frames = [
-        '.',
-        '..',
-        '...',
-        '....',
-        '.....',
-        '......',
-        '.......',
-        '........',
-        '.........',
-        '..........',
-      ]
-      let index = 0
+  /**
+   * @param {spOptions} spOptions
+   */
+  createSpinner(spOptions) {
+    // create spinner
+    const spinner = new Spinner(Object.assign({}, this.options), spOptions)
 
-      spinner = setInterval(() => {
-        const frame = frames[index++ % frames.length]
-        this.logUpdate(`${message} ${frame}`)
-      }, 200)
+    // push spinner to multibar
+    this.bars.push(spinner)
+    this.isActive = true
+
+    // hide the cursor ?
+    if (this.options.hideCursor === true) {
+      this.terminal.cursor(false)
     }
 
-    const stop = () => {
-      clearInterval(spinner)
-      this.logUpdate.clear()
-    }
+    super.update()
 
-    return { stop, start }
+    return spinner
   }
 }
 
@@ -44,13 +44,15 @@ const progressBar = new MyProgress(
   {
     stopOnComplete: true,
     clearOnComplete: true,
+    hideCursor: true,
     format: `${colors.cyan(
       '{message}'
     )} [{bar}] {percentage}% | DUR: {duration}s | ${colors.green(
       '{value}/{total}'
     )}`,
+    fps: 5,
   },
-  cliProgress.Presets.shades_grey
+  Presets.shades_grey
 )
 
 export default progressBar

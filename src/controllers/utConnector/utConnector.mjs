@@ -1,11 +1,21 @@
+// #region eslint
+
+/* eslint-disable no-useless-catch */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
+
+// #endregion
+
 // system
+import { readFile } from 'node:fs/promises'
 import { createWriteStream } from 'fs'
 import { Transform as TransformStream } from 'stream'
-import { pipeline } from 'stream/promises'
+import { pipeline } from 'node:stream/promises'
 
 // fetch
-import fetch, { Headers } from 'node-fetch'
+// eslint-disable-next-line no-unused-vars
+import fetch, { Headers, Response } from 'node-fetch'
 
 // transform
 import { AsyncParser } from '@json2csv/node'
@@ -16,9 +26,7 @@ import encoding from 'encoding'
 import progressBar from '../progressBar/index.mjs'
 import { customTransform } from '../utils.mjs'
 import colors from 'ansi-colors'
-
-// logger
-import logger from '../logger/index.mjs'
+import lodash from 'lodash'
 
 // timeout
 import timeout from '../abort/index.mjs'
@@ -27,14 +35,14 @@ class UtConnector extends TransformStream {
   constructor(options, output) {
     super(options)
 
-    this.progressBar = progressBar
-    this.spinner = this.progressBar.spinner()
+    this.multibar = progressBar
+    this.bar = null
 
     const login = 'Deductor'
     const password = 'Kj,jdLV1880'
 
-    // this.url = 'http://10.10.235.26/ut11-roz-olap/hs/reports/report'
-    this.url = 'http://ut11-roz.pochtavip.com//ut11-roz/hs/reports/report'
+    this.url = 'http://10.10.235.26/ut11-roz-olap/hs/reports/report'
+    // this.url = 'http://ut11-roz.pochtavip.com//ut11-roz/hs/reports/report'
 
     // eslint-disable-next-line operator-linebreak
     this.auth =
@@ -50,17 +58,55 @@ class UtConnector extends TransformStream {
       'windows-1251',
       'utf-8'
     )
-    this.progressBar.increment()
+    this.bar.increment()
     done(null, dataConvert)
   }
 
   /**
    * Парсим данные ответа в csv файл
-   * @param response
+   * @param {Response} response
+   * @returns {Promise<Array>}
    */
-  async #parseToCsv(response) {
-    const writeStream = createWriteStream(this.output)
+  async #readResp(response) {
     const parseStreamToJson = bigJson.createParseStream()
+
+    //--------------------------------------------------------------
+    // Чтение данных
+    //--------------------------------------------------------------
+
+    let data = []
+
+    const responseSize = +response.headers.get('Content-Length')
+
+    // progress-bar
+    const bar = this.multibar.create(responseSize, 0, {
+      message: 'Чтение данных',
+    })
+
+    if (responseSize >= 500000000) {
+      response.body.on('data', (chunk) => {
+        bar.increment(chunk.length)
+      })
+
+      parseStreamToJson.on('data', (pojo) => {
+        data = pojo
+      })
+
+      await pipeline(response.body, parseStreamToJson)
+    } else {
+      data = /** @type {Array} */ (await response.json())
+      bar.update(responseSize)
+    }
+
+    return data
+  }
+
+  /**
+   *
+   * @param {Array} responseData
+   */
+  async #writeCsv(responseData) {
+    const writeStream = createWriteStream(this.output, { flags: 'a' })
     const parseStreamToCsv = new AsyncParser(
       {
         delimiter: '\t',
@@ -68,94 +114,90 @@ class UtConnector extends TransformStream {
       },
       {}
     )
+    //--------------------------------------------------------------
+    // Запись данных
+    //--------------------------------------------------------------
 
-    let responseData = []
-    const responseSize = +response.headers.get('Content-Length')
-    try {
-      if (responseSize >= 500000000) {
-        //--------------------------------------------------------------
-        // Чтение данных
-        //--------------------------------------------------------------
-        this.progressBar.start(responseSize, 0, {
-          message: 'Чтение данных',
-        })
-
-        response.body.on('data', (chunk) => {
-          this.progressBar.increment(chunk.length)
-        })
-
-        parseStreamToJson.on('data', (pojo) => {
-          responseData = pojo
-        })
-
-        await pipeline(response.body, parseStreamToJson)
-      } else {
-        // @ts-ignore
-        responseData = await response.json()
-      }
-
-      //--------------------------------------------------------------
-      // Запись данных
-      //--------------------------------------------------------------
-      this.progressBar.start(responseData.length, 0, {
-        message: 'Запись данных',
-      })
-
-      await pipeline(parseStreamToCsv.parse(responseData), this, writeStream)
-    } catch (error) {
-      this.progressBar.stop()
-      throw error
-    }
+    // progress-bar
+    this.bar = this.multibar.create(responseData.length, 0, {
+      message: 'Запись данных',
+    })
+    await pipeline(parseStreamToCsv.parse(responseData), this, writeStream)
   }
 
   /**
    *
-   * @param {String} query текст запроса
+   * @param {string} query текст запроса
    * @param {import('./utConnector').qParams} qParams параметры запроса
+   * @param {string} loop параметры множественного запроса
    */
-  async getDataToCsv(query, qParams) {
-    let response
-
-    const body = {
-      ТекстЗапроса: query,
-      ПараметрыЗапроса: qParams,
+  async getDataToCsv(query, qParams, loop) {
+    let queryArr = [query]
+    if (loop) {
+      const loopData = await readFile(loop, 'utf-8')
+      const loopArr = loopData.split('\n')
+      queryArr = lodash.chunk(loopArr, 2).map((group) => {
+        return query.replace('&loop', group.join(','))
+      })
     }
-    const params = {
-      method: 'post',
-      body: JSON.stringify(body),
-      headers: new Headers({
-        Authorization: this.auth,
-      }),
-      signal: timeout.signal,
+
+    // Загоняем параметры в цикл
+    let params = []
+    for (const q of queryArr) {
+      const body = {
+        ТекстЗапроса: q,
+        ПараметрыЗапроса: qParams,
+      }
+      params.push({
+        method: 'post',
+        body: JSON.stringify(body),
+        headers: new Headers({
+          Authorization: this.auth,
+        }),
+        signal: timeout.signal,
+      })
     }
 
     // Запрос
-    this.spinner.start(`${colors.bold.blue('Выполнение запроса')}`)
+
+    // spinner
+    this.multibar.createSpinner({
+      message: `${colors.bold.blue('Выполнение запроса')}`,
+      frame: 'frame2',
+      showTimer: true,
+    })
     timeout.start(10)
     this.emit('loading')
 
-    try {
-      console.time('fetch')
-      response = await fetch(this.url, params)
-      // eslint-disable-next-line no-useless-catch
-    } catch (err) {
-      throw err
-    } finally {
-      this.spinner.stop()
-      timeout.stop()
-      console.timeEnd('fetch')
+    const fetchArr = []
+    let dataArr = []
+    for (const param of params) {
+      fetchArr.push(
+        // eslint-disable-next-line no-loop-func
+        (async () => {
+          const response = await fetch(this.url, param)
+          if (!response.ok) {
+            const errorMessage = await response.text()
+            throw new Error(
+              `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
+            )
+          } else {
+            const data = await this.#readResp(response)
+            dataArr = [...data, ...dataArr]
+          }
+        })()
+      )
     }
 
-    //-------------------------------------------------------
-    // Чтение ответа
-    if (response.ok) {
-      logger.info('Данные получены!!!\n')
-      await this.#parseToCsv(response)
-    } else {
-      const errorMessage = await response.text()
-      throw new Error(
-        `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
-      )
+    try {
+      await Promise.all(fetchArr)
+      await this.#writeCsv(dataArr)
+    } catch (error) {
+      timeout.abort()
+      throw error
+    } finally {
+      this.multibar.stop()
+      timeout.stop()
     }
   }
 }

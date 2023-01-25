@@ -1,3 +1,5 @@
+import { Response } from 'node-fetch'
+
 interface qParam {
   Имя: String
   Тип: String

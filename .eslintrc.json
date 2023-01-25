@@ -9,6 +9,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "ignorePatterns": ["src/bundle.js", "src/websocket/**/*.*"],
   "rules": {
     "semi": ["error", "never"],
     "linebreak-style": ["error", "windows"],

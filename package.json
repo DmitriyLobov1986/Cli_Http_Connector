@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "cd src && node --trace-deprecation --inspect  index.mjs --n=_1Cv8Import1 --p=\"/program/JS/connector/src/files/sample.ded\" --qFile",
+    "dev": "cd src && node --inspect  index.mjs --n=_1Cv8Import1 --p=\"C:/program/JS/connector/src/files/sample.ded\" --qFile --qParams --loop=\"/program/JS/connector/src/files/loop.txt\"  ",
     "pkg": "npm run build && pkg -t win src/bundle.js --output src/utConnector.exe",
     "caxa": "caxa --input . --output src/utConnector.exe -- {{caxa}}/node_modules/.bin/node {{caxa}}/src/index.mjs",
     "lint": "npx eslint src/**/*.{js,jsx,mjs}",
@@ -20,8 +20,7 @@
     "big-json": "^3.2.0",
     "cli-progress": "^3.11.2",
     "encoding": "^0.1.13",
-    "esbuild": "0.16.10",
-    "log-update": "^5.0.1",
+    "lodash": "^4.17.21",
     "minimist": "^1.2.7",
     "node-fetch": "^3.3.0",
     "nodestringtable": "^1.0.2",
@@ -32,6 +31,7 @@
   "devDependencies": {
     "build": "^0.1.4",
     "caxa": "^3.0.1",
+    "esbuild": "^0.17.3",
     "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.25.2"
