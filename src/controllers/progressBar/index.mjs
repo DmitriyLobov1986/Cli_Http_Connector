@@ -49,7 +49,7 @@ const progressBar = new MyProgress(
       '{message}'
     )} [{bar}] {percentage}% | DUR: {duration}s | ${colors.green(
       '{value}/{total}'
-    )}`,
+    )} | '{details}'`,
     fps: 5,
   },
   Presets.shades_grey

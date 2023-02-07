@@ -1,3 +1,9 @@
+// system
+import { readFile } from 'node:fs/promises'
+
+// utils
+import lodash from 'lodash'
+
 // #region 1C
 
 /**
@@ -34,6 +40,18 @@ const getFieldsData = (name, dataType) => {
   return { name, alias, dataType }
 }
 
+/**
+ * Создаёт массив фильтров для паралелльных запросов
+ * @param {string} filtPath  путь к файлу фильтров
+ * @returns {Promise<Array>} массив фильтров
+ */
+const filtChunk = async (filtPath) => {
+  const loopData = await readFile(filtPath, 'utf-8')
+  const loopArr = loopData.split('\n')
+  // const grSize = Math.ceil(loopArr.length / 10)
+  return lodash.chunk(loopArr, 2)
+}
+
 // #endregion
 
 /**
@@ -44,12 +62,14 @@ const getFieldsData = (name, dataType) => {
  */
 const customTransform = (str, delimiter) => {
   const strArr = str.split(delimiter)
-  const newStrArr = strArr.map((v) => v
-    .replace(/(?<=^\r\n)"|^"|"$/g, '')
-    .replace(new RegExp(String.fromCharCode(160), 'g'), '')
-    .replace(/^Да$/, 'true')
-    .replace(/^Нет$/, 'false'))
+  const newStrArr = strArr.map((v) =>
+    v
+      .replace(/(?<=^\r\n)"|^"|"$/g, '')
+      .replace(new RegExp(String.fromCharCode(160), 'g'), '')
+      .replace(/^Да$/, 'true')
+      .replace(/^Нет$/, 'false')
+  )
   return newStrArr.join(delimiter)
 }
 
-export { dateTime1C, getFieldsData, customTransform }
+export { dateTime1C, getFieldsData, filtChunk, customTransform }

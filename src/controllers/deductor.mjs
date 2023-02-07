@@ -28,6 +28,8 @@ class Deductor {
     const path = resolve(cwd(), 'config.json')
     const jsonString = readFileSync(path, 'utf8')
     this.meta = JSON.parse(jsonString)
+
+    this.scenar = null
   }
 
   /**
@@ -35,6 +37,8 @@ class Deductor {
    * @param {String} path путь к файлу сценария
    */
   async initialize(path) {
+    if (this.scenar) return
+
     // промисификация
     const execProm = promisify(exec)
     const dir = path.slice(0, -4)

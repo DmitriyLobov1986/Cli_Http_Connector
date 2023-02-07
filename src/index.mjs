@@ -15,7 +15,7 @@ import logger from './controllers/logger/index.mjs'
 import nsTable from 'nodestringtable'
 
 // params
-import minimist from 'minimist'
+import argv from './controllers/yargs/index.mjs'
 
 // utils
 import colors from 'ansi-colors'
@@ -28,30 +28,19 @@ const rl = readline.createInterface({
   output: process.stdout,
 })
 
-// Переменные запуска
-let {
-  n: node,
-  p: filePath,
-  q: query,
-  qFile = false,
-  qParams,
-  log,
-  loop,
-} = minimist(process.argv.slice(2))
-
 /**
  * Обработчик ошибок
  * @param {Error} error
  */
 function errorHandler(error) {
-  if (!log) {
-    logger.error(error)
-    rl.question('\n Press enter', () => rl.close())
-  } else {
-    logger.logInFile('error', `${filePath}\n${error.stack}`, './log.log')
-    process.exitCode = 1
-    rl.close()
-  }
+  // if (!log) {
+  logger.error(error)
+  rl.question('\n Press enter', () => rl.close())
+  // } else {
+  //   logger.logInFile('error', `${argv.path}\n${error.stack}`, './log.log')
+  //   process.exitCode = 1
+  //   rl.close()
+  // }
 }
 
 const convertImports = async () => {
@@ -85,29 +74,30 @@ const convertImports = async () => {
 const utImport = async () => {
   const deductor = new Deductor()
 
-  if (qFile) {
-    query = readFileSync('./files/query.txt', 'utf-8')
+  let query = argv.query
+  if (!query) {
+    await deductor.initialize(argv.path)
+    query = deductor.getQueryTextByNode(argv.name)
   }
 
-  if (!qParams) {
-    qParams = []
-  } else {
+  if (existsSync(argv.query)) {
+    query = readFileSync(argv.query, 'utf-8')
+  }
+
+  let qParams = []
+  if (argv.params) {
     switch (typeof qParams) {
       case 'string':
         qParams = JSON.parse(qParams)
         break
       default:
-        await deductor.initialize(filePath)
+        await deductor.initialize(argv.path)
         qParams = deductor.formQueryParams()
     }
   }
 
-  if (!query) {
-    await deductor.initialize(filePath)
-    query = deductor.getQueryTextByNode(node)
-  }
   //------------------------------------------------------
-  const output = path.join(path.dirname(filePath), 'ut', `${node}.csv`)
+  const output = path.join(path.dirname(argv.path), 'ut', `${argv.name}.csv`)
   await mkdir(path.dirname(output), { recursive: true })
 
   if (existsSync(output)) {
@@ -123,10 +113,10 @@ const utImport = async () => {
   )
   //------------------------------------------------------
   const utConnector = new UtConnector({}, output)
-  await utConnector.getDataToCsv(query, qParams, loop)
+  await utConnector.getDataToCsv(query, qParams, argv.loop)
 }
 
-if (node && (filePath || query || qFile)) {
+if (argv._[0] === 'import') {
   utImport()
     .then(() => {
       rl.close()
