@@ -6,5 +6,9 @@
   "rptV8Record": "Запись",
   "rptV8Period": "Период",
   "dtDateTime": "Дата",
-  "dtFloat": "Число"
+  "dtFloat": "Число",
+  "bases": {
+    "ut": "http://ut11-roz.pochtavip.com//ut11-roz/hs/reports/report",
+    "utOlap": "http://10.10.235.26/ut11-roz-olap/hs/reports/report"
+  }
 }

@@ -10,4 +10,5 @@ export interface Argv extends Yargs {
   query?: string
   params?: string | boolean
   loop?: string
+  base?: string
 }

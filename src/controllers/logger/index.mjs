@@ -2,26 +2,34 @@ import winston from 'winston-callback'
 
 const { createLogger, format, transports } = winston
 
+function createLoggerInstance() {
+  const myFormat = format.printf(({ level, message, timestamp, stack }) => {
+    return `\n ${timestamp} ${level}: \n${stack || message}\n`
+  })
+
+  const colorFormat = { info: 'underline blue' }
+
+  return createLogger({
+    format: format.combine(
+      format.errors({ stack: true }),
+      format.colorize({
+        colors: colorFormat,
+      }),
+      format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
+      myFormat
+    ),
+  })
+}
+
 class MyLogger {
   constructor() {
-    const myFormat = format.printf(({ level, message, timestamp, stack }) => {
-      return `\n ${timestamp} ${level}: \n${stack || message}\n`
-    })
+    this.logger = createLoggerInstance()
+  }
 
-    const colorFormat = { info: 'underline blue' }
-
-    const logger = createLogger({
-      format: format.combine(
-        format.errors({ stack: true }),
-        format.colorize({
-          colors: colorFormat,
-        }),
-        format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-        myFormat
-      ),
-      transports: [new transports.Console({})],
-    })
-    this.logger = logger
+  /** @param {winston.transport} transport */
+  #setTransport(transport = new transports.Console({})) {
+    this.logger.clear()
+    this.logger.add(transport)
   }
 
   /**
@@ -36,24 +44,22 @@ class MyLogger {
       // options: { flags: 'w' },
     })
 
-    // if (callback) {
-    //   watch(dirname(path), (event, filename) => {
-    //     if (event === 'change' && filename === basename(path)) {
-    //       callback()
-    //     }
-    //   })
-    // }
-
-    this.logger.add(fileTransport)
+    this.#setTransport(fileTransport)
     this.logger.log(level, message)
-    this.logger.remove(fileTransport)
+  }
+
+  log(level, message) {
+    this.#setTransport()
+    this.logger.log(level, message)
   }
 
   info(message) {
+    this.#setTransport()
     this.logger.info(message)
   }
 
   error(message) {
+    this.#setTransport()
     this.logger.error(message)
   }
 }

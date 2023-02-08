@@ -19,11 +19,16 @@ const argv = yargs
       })
       .option('params', {
         alias: 'opts',
-        describe: 'query params ',
+        describe: 'query params',
       })
       .option('loop', {
-        describe: 'loop file ',
+        describe: 'loop file',
         type: 'string',
+      })
+      .option('base', {
+        describe: 'loading base',
+        type: 'string',
+        default: 'utOlap',
       })
   })
   .version(false)

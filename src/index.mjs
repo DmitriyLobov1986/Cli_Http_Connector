@@ -111,8 +111,9 @@ const utImport = async () => {
     )}`,
     output.replace('.csv', '.log')
   )
+  logger.info(`${nsTable(qParams)}`)
   //------------------------------------------------------
-  const utConnector = new UtConnector({}, output)
+  const utConnector = new UtConnector({ base: argv.base, output })
   await utConnector.getDataToCsv(query, qParams, argv.loop)
 }
 

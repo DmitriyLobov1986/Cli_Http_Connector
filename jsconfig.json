@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2015",
+    "module": "ESNext",
     "allowJs": true,
     "checkJs": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   }
 }

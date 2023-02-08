@@ -8,9 +8,12 @@
 // #endregion
 
 // system
-import { createWriteStream } from 'fs'
+import { createWriteStream, readFileSync } from 'fs'
 import { Transform as TransformStream } from 'stream'
 import { pipeline } from 'node:stream/promises'
+
+// settings
+const settings = JSON.parse(readFileSync('./config.json', 'utf-8'))
 
 // fetch
 // eslint-disable-next-line no-unused-vars
@@ -30,15 +33,15 @@ import colors from 'ansi-colors'
 import timeout from '../abort/index.mjs'
 
 class UtConnector {
-  constructor(options, output) {
+  /** @param {import('./utConnector').Options} options параметры */
+  constructor({ base, output }) {
     this.multibar = progressBar
     this.bar = null
 
     const login = 'Deductor'
     const password = 'Kj,jdLV1880'
 
-    this.url = 'http://10.10.235.26/ut11-roz-olap/hs/reports/report'
-    // this.url = 'http://ut11-roz.pochtavip.com//ut11-roz/hs/reports/report'
+    this.url = settings.bases[base]
 
     // eslint-disable-next-line operator-linebreak
     this.auth =
@@ -202,6 +205,9 @@ class UtConnector {
 
     try {
       await Promise.all(fetchArr)
+    } catch (err) {
+      timeout.abort()
+      throw err
     } finally {
       this.multibar.stop()
       timeout.stop()

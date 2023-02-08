@@ -6,4 +6,9 @@ interface qParam {
   Значение: String | Number | Boolean
 }
 
+interface Options {
+  base: string
+  output: string
+}
+
 export type qParams = Array<qParam>
