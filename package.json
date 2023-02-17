@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/src/files/sample.ded\" _1Cv8Import1 --q=\"C:/program/JS/connector/src/files/query.txt\" --opts --loop=\"C:/program/JS/connector/src/files/loop.txt\" ",
+    "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/src/files/query.txt\" --params ",
     "pkg": "npm run build && pkg -t win src/bundle.js --output src/utConnector.exe",
     "caxa": "caxa --input . --output src/utConnector.exe -- {{caxa}}/node_modules/.bin/node {{caxa}}/src/index.mjs",
     "lint": "npx eslint src/**/*.{js,jsx,mjs}",

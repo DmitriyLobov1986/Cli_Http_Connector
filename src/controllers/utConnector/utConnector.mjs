@@ -26,7 +26,7 @@ import bigJson from 'big-json'
 // utils
 import encoding from 'encoding'
 import progressBar from '../progressBar/index.mjs'
-import { filtChunk, customTransform } from '../utils.mjs'
+import * as utils from './helpers.mjs'
 import colors from 'ansi-colors'
 
 // timeout
@@ -51,11 +51,25 @@ class UtConnector {
   }
 
   /**
+   * Пишем заголовок
+   * @param {Array<string>} fields поля запроса
+   */
+  #writeHeader(fields) {
+    const writeStream = createWriteStream(this.output, { flags: 'a' })
+
+    const header = encoding.convert(fields.join('\t'), 'windows-1251')
+
+    writeStream.write(header)
+    writeStream.end()
+  }
+
+  /**
    * Парсим данные ответа в csv файл
    * @param {Response} response fetch response
+   * @param {Array<string>} fields query fields
    * @param {String} barMessage
    */
-  async #writeResp(response, barMessage) {
+  async #writeResp(response, fields, barMessage) {
     const responseSize = +response.headers.get('Content-Length')
 
     // progress-bar
@@ -70,6 +84,8 @@ class UtConnector {
       {
         delimiter: '\t',
         doubleQuote: 'quote',
+        header: false,
+        fields,
       },
       {}
     )
@@ -78,7 +94,7 @@ class UtConnector {
       objectMode: true,
       transform(chunk, enc, done) {
         const dataConvert = encoding.convert(
-          customTransform(chunk.toString(), '\t'),
+          utils.customTransform(chunk.toString(), '\t'),
           'windows-1251',
           'utf-8'
         )
@@ -157,13 +173,10 @@ class UtConnector {
    *
    * @param {string} query текст запроса
    * @param {import('./utConnector').qParams} qParams параметры запроса
-   * @param {string} [loop] путь к файлу параметров
    */
-  async getDataToCsv(query, qParams, loop) {
-    let filtArr = ['']
-    if (loop) {
-      filtArr = await filtChunk(loop)
-    }
+  async getDataToCsv(query, qParams) {
+    const filtArr = utils.getQueryChunks(query)
+    const fileds = utils.getQueryFields(query)
 
     // spinner
     this.multibar.createSpinner({
@@ -198,12 +211,17 @@ class UtConnector {
             this.#fetch(resolve, reject, params)
           })
 
-          await this.#writeResp(response, f.toString().replace(/\r|\n/g, ''))
+          await this.#writeResp(
+            response,
+            fileds,
+            f.toString().replace(/\r|\n/g, '')
+          )
         })()
       )
     }
 
     try {
+      this.#writeHeader(fileds)
       await Promise.all(fetchArr)
     } catch (err) {
       timeout.abort()

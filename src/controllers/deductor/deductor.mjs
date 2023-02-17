@@ -14,7 +14,7 @@ import xml2js from 'xml2js'
 
 // utils
 import { dateTime1C, getFieldsData } from './utils.mjs'
-import logger from './logger/index.mjs'
+import logger from '../logger/index.mjs'
 
 // #endregion
 

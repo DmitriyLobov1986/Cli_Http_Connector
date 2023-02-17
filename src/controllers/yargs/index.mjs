@@ -18,12 +18,13 @@ const argv = yargs
         type: 'string',
       })
       .option('params', {
-        alias: 'opts',
+        alias: 'qParams',
         describe: 'query params',
       })
       .option('loop', {
-        describe: 'loop file',
-        type: 'string',
+        describe: 'chunk size',
+        type: 'number',
+        default: 2,
       })
       .option('base', {
         describe: 'loading base',

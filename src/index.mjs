@@ -7,7 +7,7 @@ import process from 'process'
 import readline from 'readline'
 
 // my Classes
-import Deductor from './controllers/deductor.mjs'
+import Deductor from './controllers/deductor/deductor.mjs'
 import UtConnector from './controllers/utConnector/utConnector.mjs'
 
 // logger
@@ -86,9 +86,9 @@ const utImport = async () => {
 
   let qParams = []
   if (argv.params) {
-    switch (typeof qParams) {
+    switch (typeof argv.params) {
       case 'string':
-        qParams = JSON.parse(qParams)
+        qParams = JSON.parse(argv.params)
         break
       default:
         await deductor.initialize(argv.path)
