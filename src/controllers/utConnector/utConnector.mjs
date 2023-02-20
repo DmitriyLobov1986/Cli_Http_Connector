@@ -184,8 +184,18 @@ class UtConnector {
       frame: 'frame2',
       showTimer: true,
     })
+
+    // bar
+    let bar = null
+    if (filtArr.length > 10) {
+      bar = this.multibar.create(filtArr.length, 0, {
+        message: 'Обработка пакета',
+        details: 'запись данных!!!!',
+      })
+      this.multibar.multimode = false
+    }
+
     timeout.start(10)
-    // this.emit('loading')
 
     // цикл по фильтрам
     const fetchArr = []
@@ -216,6 +226,7 @@ class UtConnector {
             fileds,
             f.toString().replace(/\r|\n/g, '')
           )
+          if (bar) bar.increment()
         })()
       )
     }

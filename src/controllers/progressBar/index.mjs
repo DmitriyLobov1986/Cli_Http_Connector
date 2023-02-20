@@ -16,6 +16,9 @@ import colors from 'ansi-colors'
 class MyProgress extends MultiBar {
   constructor(opt, preset) {
     super(opt, preset)
+
+    // multi mode
+    this.multimode = true
   }
 
   /**
@@ -37,6 +40,26 @@ class MyProgress extends MultiBar {
     super.update()
 
     return spinner
+  }
+
+  // @ts-ignore
+  create(total, startValue, payload) {
+    if (this.multimode) {
+      return super.create(total, startValue, payload)
+    }
+
+    // mokka bar
+    return {
+      increment(size) {
+        return size
+      },
+      update(chunk) {
+        return chunk
+      },
+      start(totV, stV, pl) {
+        return { totV, stV, pl }
+      },
+    }
   }
 }
 
