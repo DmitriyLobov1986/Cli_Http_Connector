@@ -31,6 +31,10 @@ const argv = yargs
         type: 'string',
         default: 'utOlap',
       })
+      .option('session', {
+        describe: 'use cookie IBSession ',
+        type: 'boolean',
+      })
   })
   .version(false)
   .help()

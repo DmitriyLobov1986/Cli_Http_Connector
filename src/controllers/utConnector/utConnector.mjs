@@ -17,7 +17,8 @@ const settings = JSON.parse(readFileSync('./config.json', 'utf-8'))
 
 // fetch
 // eslint-disable-next-line no-unused-vars
-import fetch, { AbortError, Headers, Response } from 'node-fetch'
+import { fetch, Headers, Response } from 'node-fetch-cookies'
+import CookiJar from './cookies.mjs'
 
 // transform
 import { AsyncParser } from '@json2csv/node'
@@ -138,30 +139,38 @@ class UtConnector {
   }
 
   async #fetch(...args) {
-    const [resolve, reject, params, tm] = args
+    const [resolve, reject, params, cookieJar, tm] = args
 
-    const response = await fetch(this.url, params).catch((err) => {
+    const response = await fetch(cookieJar, this.url, params).catch((err) => {
       reject(err)
     })
+
+    const refresh = (self) => {
+      if (tm) clearTimeout(tm)
+      const timer = setTimeout(() => {
+        self.#fetch(resolve, reject, params, cookieJar, timer)
+      }, 4000)
+    }
 
     if (!response) return
     if (!response.ok) {
       switch (response.status) {
         case 406: {
-          const self = this
-          if (tm) clearTimeout(tm)
-          const timer = setTimeout(() => {
-            self.#fetch(resolve, reject, params, timer)
-          }, 4000)
+          refresh(this)
           break
         }
         default: {
           const errorMessage = await response.text()
-          reject(
-            new Error(
-              `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
+          if (errorMessage.includes('Сеанс отсутствует')) {
+            cookieJar.cookies.clear()
+            refresh(this)
+          } else {
+            reject(
+              new Error(
+                `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
+              )
             )
-          )
+          }
         }
       }
     } else {
@@ -177,6 +186,10 @@ class UtConnector {
   async getDataToCsv(query, qParams) {
     const filtArr = utils.getQueryChunks(query)
     const fileds = utils.getQueryFields(query)
+
+    // cookies
+    const cookieJar = new CookiJar(this.output)
+    await cookieJar.loadCookies()
 
     // spinner
     this.multibar.createSpinner({
@@ -210,6 +223,7 @@ class UtConnector {
         body: JSON.stringify(body),
         headers: new Headers({
           Authorization: this.auth,
+          IBSession: 'start',
         }),
         signal: timeout.create(),
       }
@@ -218,7 +232,7 @@ class UtConnector {
         // eslint-disable-next-line no-loop-func
         (async () => {
           const response = await new Promise((resolve, reject) => {
-            this.#fetch(resolve, reject, params)
+            this.#fetch(resolve, reject, params, cookieJar)
           })
 
           await this.#writeResp(
@@ -234,6 +248,7 @@ class UtConnector {
     try {
       this.#writeHeader(fileds)
       await Promise.all(fetchArr)
+      await cookieJar.saveCookies()
     } catch (err) {
       timeout.abort()
       throw err

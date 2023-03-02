@@ -114,7 +114,7 @@ const utImport = async () => {
   logger.info(`${nsTable(qParams)}`)
   //------------------------------------------------------
   const utConnector = new UtConnector({ base: argv.base, output })
-  await utConnector.getDataToCsv(query, qParams, argv.loop)
+  await utConnector.getDataToCsv(query, qParams)
 }
 
 if (argv._[0] === 'import') {

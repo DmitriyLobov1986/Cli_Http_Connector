@@ -23,10 +23,8 @@ const getQueryFields = (query) => {
       .split('ИЗ')[0]
       .split(',')
       .forEach((v) => {
-        const field = v.split('КАК')[1]
-        if (field) {
-          alias.push(field.replace(/[\s\r,]/gi, ''))
-        }
+        const field = v.split('КАК')[1] ?? v.split('.').slice(1).join()
+        alias.push(field.replace(/[\s\r,.]/gi, ''))
       })
 
     if (alias.length) break
@@ -71,11 +69,13 @@ const customTransform = (str, delimiter) => {
 
   // форматируем
   const strArr = str.split(delimiter)
-  const newStrArr = strArr.map((v) => v
-    .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
-    .replace(new RegExp(String.fromCharCode(160), 'g'), '')
-    .replace(/^Да$/, 'true')
-    .replace(/^Нет$/, 'false'))
+  const newStrArr = strArr.map((v) =>
+    v
+      .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
+      .replace(new RegExp(String.fromCharCode(160), 'g'), '')
+      .replace(/^Да$/, 'true')
+      .replace(/^Нет$/, 'false')
+  )
   return newStrArr.join(delimiter)
 }
 

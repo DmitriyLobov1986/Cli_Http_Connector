@@ -11,4 +11,5 @@ export interface Argv extends Yargs {
   params?: string | boolean
   loop?: number
   base?: string
+  session?: boolean
 }
