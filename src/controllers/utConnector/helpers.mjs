@@ -8,6 +8,7 @@ import argv from '../yargs/index.mjs'
 // utils
 import lodash from 'lodash'
 import encoding from 'encoding'
+import moment from 'moment'
 
 /**
  * Получение массива полей запроса
@@ -64,19 +65,21 @@ const getQueryChunks = (query) => {
  * @returns {String} отформатированная строка
  */
 const customTransform = (str, delimiter) => {
-  // Добавляем перенос (если надо)
-  str = str[0] === '\r' ? str : `\r\n${str}`
-
   // форматируем
   const strArr = str.split(delimiter)
-  const newStrArr = strArr.map((v) =>
-    v
-      .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
+  const newStrArr = strArr.map((v) => {
+    const transValue = v
+      // .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
+      .replace(/[\r\n]/g, '')
+      .replace(/^"|"$/g, '')
       .replace(new RegExp(String.fromCharCode(160), 'g'), '')
       .replace(/^Да$/, 'true')
       .replace(/^Нет$/, 'false')
-  )
-  return newStrArr.join(delimiter)
+
+    const day = moment(transValue, 'YYYY-MM-DDTHH:mm:ss', true)
+    return day.isValid() ? day.format('DD.MM.YYYY') : transValue
+  })
+  return `\r\n${newStrArr.join(delimiter)}`
 }
 
 export { getQueryChunks, customTransform, getQueryFields }

@@ -172,7 +172,7 @@ class Deductor {
 
       // Подменим узел импорта из 1С в компоненте
       const queryText = this.#getQuery(node)
-      node.QueryText = [queryText]
+      node.Component[0].QueryText = [queryText]
       node.VendorName[0] = 'TBG1Cv8QueryImportVendor'
 
       // Вывод в консоль

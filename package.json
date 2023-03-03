@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/src/files/query.txt\" --params --base=gls --session ",
+    "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/src/files/query.txt\" --params ",
     "pkg": "npm run build && pkg -t win src/bundle.js --output src/utConnector.exe",
     "caxa": "caxa --input . --output src/utConnector.exe -- {{caxa}}/node_modules/.bin/node {{caxa}}/src/index.mjs",
     "lint": "npx eslint src/**/*.{js,jsx,mjs}",
@@ -21,10 +21,9 @@
     "cli-progress": "^3.11.2",
     "encoding": "^0.1.13",
     "lodash": "^4.17.21",
-    "node-fetch": "^3.3.0",
+    "moment": "^2.29.4",
     "node-fetch-cookies": "^2.0.4",
     "nodestringtable": "^1.0.2",
-    "winston": "^3.8.2",
     "winston-callback": "^3.1.5",
     "xml2js": "^0.4.23",
     "yargs": "^17.6.2"
