@@ -22,6 +22,7 @@ import CookiJar from './cookies.mjs'
 
 // transform
 import { AsyncParser } from '@json2csv/node'
+import { stringQuoteOnlyIfNecessary as stringQuoteOnlyIfNecessaryFormatter } from '@json2csv/formatters'
 import bigJson from 'big-json'
 
 // utils
@@ -87,15 +88,18 @@ class UtConnector {
         doubleQuote: 'quote',
         header: false,
         fields,
+        transforms: [utils.customTransform],
+        formatters: {
+          string: stringQuoteOnlyIfNecessaryFormatter({ quote: '' }),
+        },
       },
       {}
     )
 
     const transform = new TransformStream({
-      objectMode: true,
       transform(chunk, enc, done) {
         const dataConvert = encoding.convert(
-          utils.customTransform(chunk.toString(), '\t'),
+          '\r\n' + chunk.toString().replace(/[\r\n]/g, ''),
           'windows-1251',
           'utf-8'
         )

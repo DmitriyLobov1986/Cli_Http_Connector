@@ -59,27 +59,27 @@ const getQueryChunks = (query) => {
 }
 
 /**
- * Удаляет кавычки в начале и конце полей
- * @param {String} str строка csv
- * @param {String} delimiter разделитель
- * @returns {String} отформатированная строка
+ * Форматирует значения полей объекта
+ * @param {object} item
+ * @returns {object} отформотированный объект
  */
-const customTransform = (str, delimiter) => {
-  // форматируем
-  const strArr = str.split(delimiter)
-  const newStrArr = strArr.map((v) => {
+const customTransform = (item) => {
+  const modArr = Object.entries(item).map(([k, v]) => {
+    if (typeof v !== 'string') {
+      return [k, v]
+    }
+
     const transValue = v
       // .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
-      .replace(/[\r\n]/g, '')
-      .replace(/^"|"$/g, '')
+      .replace(/[\r\n\t]/g, '')
       .replace(new RegExp(String.fromCharCode(160), 'g'), '')
       .replace(/^Да$/, 'true')
       .replace(/^Нет$/, 'false')
-
     const day = moment(transValue, 'YYYY-MM-DDTHH:mm:ss', true)
-    return day.isValid() ? day.format('DD.MM.YYYY') : transValue
+    return [k, day.isValid() ? day.format('DD.MM.YYYY') : transValue]
   })
-  return `\r\n${newStrArr.join(delimiter)}`
+
+  return Object.fromEntries(modArr)
 }
 
 export { getQueryChunks, customTransform, getQueryFields }
