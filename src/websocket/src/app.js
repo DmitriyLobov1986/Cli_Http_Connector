@@ -3,8 +3,8 @@ import express from 'express'
 import expressWs from 'express-ws'
 
 // **********controllers**********
-import { connHandler } from './controllers/connector.js'
-import { wsHandler } from './controllers/ws.js'
+import { connHandler } from './src/controllers/connector.js'
+import { wsHandler } from './src/controllers/ws.js'
 
 const app = express()
 expressWs(app)
