@@ -7,9 +7,19 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Запустить программу",
+      "name": "ut loop",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\src/index.js"
+      "program": "${workspaceFolder}\\cli/src/index.mjs",
+      "cwd": "${workspaceFolder}\\cli/src",
+      "console": "integratedTerminal",
+      "args": [
+        "import",
+        "C:/program/JS/connector/cli/src/files/sample2.ded",
+        "_sample",
+        "--q=\"C:/program/JS/connector/cli/src/files/query.txt\"",
+        "--params",
+        "--loop=10"
+      ]
     }
   ]
 }

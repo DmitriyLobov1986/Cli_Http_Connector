@@ -2,7 +2,7 @@
   "name": "connector",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/controllers/utConnector/utConnector.mjs",
   "type": "module",
   "scripts": {
     "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/src/files/query.txt\" --params --loop=10  ",
