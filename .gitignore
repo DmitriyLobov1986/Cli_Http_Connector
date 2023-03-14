@@ -1,7 +1,7 @@
-/src/websocket/node_modules
-/node_modules
+**/node_modules
+**/files
 
 
 # output files
-/src/files
-src/bundle.js
+#/src/files
+#src/bundle.js

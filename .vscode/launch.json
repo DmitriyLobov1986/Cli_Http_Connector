@@ -1,15 +1,18 @@
 {
-  // Используйте IntelliSense, чтобы узнать о возможных атрибутах.
-  // Наведите указатель мыши, чтобы просмотреть описания существующих атрибутов.
-  // Для получения дополнительной информации посетите: https://go.microsoft.com/fwlink/?linkid=830387
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
       "type": "node",
       "request": "launch",
-      "name": "Запустить программу",
+      "name": "nodemon",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\src/index.js"
+      "program": "${workspaceFolder}/src/websocket/node_modules/nodemon/bin/nodemon.js",
+      "args": ["src/app.ts"],
+      "cwd": "${workspaceFolder}/src/websocket",
+      "console": "integratedTerminal"
     }
   ]
 }
