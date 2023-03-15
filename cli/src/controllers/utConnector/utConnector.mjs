@@ -35,7 +35,7 @@ import colors from 'ansi-colors'
 import timeout from '../abort/index.mjs'
 
 class UtConnector {
-  /** @param {import('./utConnector').Options} options параметры */
+  /** @param {import('./types').Options} options параметры */
   constructor({ base, output }) {
     this.multibar = progressBar
     this.bar = null
@@ -185,7 +185,7 @@ class UtConnector {
   /**
    *
    * @param {string} query текст запроса
-   * @param {import('./utConnector').qParams} qParams параметры запроса
+   * @param {import('./types').qParams} qParams параметры запроса
    */
   async getDataToCsv(query, qParams) {
     const filtArr = utils.getQueryChunks(query)

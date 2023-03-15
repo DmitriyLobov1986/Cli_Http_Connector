@@ -1,6 +1,6 @@
 // #region imports
 import { Presets } from 'cli-progress'
-import MultiBar from '../../../node_modules/cli-progress/lib/multi-bar.js'
+import { MultiBar } from 'cli-progress'
 import Spinner from './spinner.mjs'
 import colors from 'ansi-colors'
 // #endregion

@@ -1,4 +1,4 @@
-import { Response } from 'node-fetch'
+import { Response } from 'node-fetch-cookies'
 
 interface qParam {
   Имя: String
@@ -6,7 +6,7 @@ interface qParam {
   Значение: String | Number | Boolean
 }
 
-interface Options {
+export interface Options {
   base: string
   output: string
 }

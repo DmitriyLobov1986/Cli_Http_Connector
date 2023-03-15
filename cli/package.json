@@ -1,11 +1,12 @@
 {
   "name": "connector",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "main": "src/controllers/utConnector/utConnector.mjs",
+  "types": "src/controllers/utConnector/utConnector.d.ts",
   "type": "module",
   "scripts": {
-    "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/src/files/query.txt\" --params --loop=10  ",
+    "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/cli/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/cli/src/files/query.txt\" --params --loop=10  ",
     "pkg": "npm run build && pkg -t win src/bundle.js --output src/utConnector.exe",
     "caxa": "caxa --input . --output src/utConnector.exe -- {{caxa}}/node_modules/.bin/node {{caxa}}/src/index.mjs",
     "lint": "npx eslint src/**/*.{js,jsx,mjs}",
@@ -35,6 +36,7 @@
     "esbuild": "^0.17.3",
     "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.2"
+    "eslint-plugin-import": "^2.25.2",
+    "typescript": "^4.9.5"
   }
 }
