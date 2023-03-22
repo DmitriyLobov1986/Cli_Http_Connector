@@ -12,9 +12,6 @@ import { createWriteStream, readFileSync } from 'fs'
 import { Transform as TransformStream } from 'stream'
 import { pipeline } from 'node:stream/promises'
 
-// settings
-const settings = JSON.parse(readFileSync('./config.json', 'utf-8'))
-
 // fetch
 // eslint-disable-next-line no-unused-vars
 import { fetch, Headers, Response } from 'node-fetch-cookies'
@@ -36,13 +33,14 @@ import timeout from '../abort/index.mjs'
 
 class UtConnector {
   /** @param {import('./types').Options} options параметры */
-  constructor({ base, output }) {
+  constructor({ base, output, config = './config.json' }) {
     this.multibar = progressBar
     this.bar = null
 
+    //settings
+    const settings = JSON.parse(readFileSync(config, 'utf-8'))
     const login = 'Deductor'
     const password = 'Kj,jdLV1880'
-
     this.url = settings.bases[base]
 
     // eslint-disable-next-line operator-linebreak

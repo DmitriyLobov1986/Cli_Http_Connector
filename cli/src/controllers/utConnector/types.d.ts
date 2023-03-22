@@ -9,6 +9,7 @@ interface qParam {
 export interface Options {
   base: string
   output: string
+  config?: string
 }
 
 export type qParams = Array<qParam>
