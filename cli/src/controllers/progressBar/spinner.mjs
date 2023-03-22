@@ -1,4 +1,4 @@
-import _Terminal from '../../../node_modules/cli-progress/lib/terminal.js'
+import { Bar } from 'cli-progress'
 
 const frames = {
   frame1: [
@@ -16,20 +16,10 @@ const frames = {
   frame2: ['-', '\\', '|', '/'],
 }
 
-class Spinner {
+class Spinner extends Bar {
   constructor(options, { frame, message, showTimer = false }) {
-    // store options
-    this.options = options
+    super(options)
 
-    // store terminal instance
-    this.terminal = this.options.terminal
-      ? this.options.terminal
-      : new _Terminal(this.options.stream)
-
-    // last drawn string - only render on change!
-    this.lastDrawnString = null
-
-    // set flag
     this.isActive = true
 
     // spinner message
