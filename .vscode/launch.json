@@ -9,9 +9,9 @@
       "request": "launch",
       "name": "nodemon",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/src/websocket/node_modules/nodemon/bin/nodemon.js",
+      "program": "${workspaceFolder}/websocket/server/node_modules/nodemon/bin/nodemon.js",
       "args": ["src/app.ts"],
-      "cwd": "${workspaceFolder}/src/websocket",
+      "cwd": "${workspaceFolder}/websocket/server",
       "console": "integratedTerminal"
     }
   ]

@@ -1,42 +1,33 @@
+// **********node js**********
+import { existsSync, readFileSync } from 'node:fs'
+
 // **********wsClients**********
-import { wsClients } from './ws.js'
+import { wsSendMessage } from './ws.js'
 
 // **********utConnector**********
-import UtConnector from '../../../controllers/utConnector/utConnector.mjs'
+import Connector from 'connector'
 
-const connHandler = (req, res) => {
-  const { query, params = [], output = './test.csv', user = '' } = req.body
-  const conn = new UtConnector({}, output)
+// **********types**********
+import { Request, Response } from 'express'
+import { ConnInterface } from './types/index.js'
 
-  // **********websoket**********
-  conn.on('loading', () => {
-    wsClients.forEach((ws) => {
-      const msg = {
-        user,
-        text: 'loading',
-      }
-      ws.send(JSON.stringify(msg))
-    })
-  })
+const connHandler = (req: Request<{}, {}, ConnInterface>, res: Response) => {
+  let { base, query, params = [], output, config, user } = req.body
 
-  // **********answer**********
-  const queryRes = conn.getDataToCsv(query, params)
-  queryRes
+  if (existsSync(query)) {
+    query = readFileSync(query, 'utf-8')
+  }
+
+  const conn = new Connector({ base, output, config })
+  conn
+    .getDataToCsv(query, params)
     .then(() => {
-      res.end('query is ok!!!!')
+      res.send('query is ok')
+      wsSendMessage('query is ok', user)
     })
     .catch((err) => {
       res.status(400)
       res.end(err.message)
-    })
-    .finally(() => {
-      wsClients.forEach((ws) => {
-        const msg = {
-          user,
-          text: 'finish',
-        }
-        ws.send(JSON.stringify(msg))
-      })
     })
 }
 
