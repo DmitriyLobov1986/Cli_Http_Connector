@@ -37,7 +37,7 @@ class UtConnector {
     this.multibar = progressBar
     this.bar = null
 
-    //settings
+    // settings
     const settings = JSON.parse(readFileSync(config, 'utf-8'))
     const login = 'Deductor'
     const password = 'Kj,jdLV1880'

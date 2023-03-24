@@ -5,9 +5,6 @@ declare class Spinner {
         message: any;
         showTimer?: boolean;
     });
-    options: any;
-    terminal: any;
-    lastDrawnString: string;
     isActive: boolean;
     message: any;
     frame: any;
@@ -15,5 +12,6 @@ declare class Spinner {
     start: any;
     showTimer: boolean;
     render(forceRendering?: boolean): void;
+    lastDrawnString: string;
     stop(): void;
 }

@@ -1,6 +1,5 @@
 // #region imports
-import { Presets } from 'cli-progress'
-import { MultiBar } from 'cli-progress'
+import { Presets, MultiBar } from 'cli-progress'
 import Spinner from './spinner.mjs'
 import colors from 'ansi-colors'
 // #endregion
@@ -16,9 +15,13 @@ import colors from 'ansi-colors'
 class MyProgress extends MultiBar {
   constructor(opt, preset) {
     super(opt, preset)
+    this.bars = []
 
     // multi mode
     this.multimode = true
+
+    //
+    this.progress = 0
   }
 
   /**
@@ -37,7 +40,7 @@ class MyProgress extends MultiBar {
       this.terminal.cursor(false)
     }
 
-    super.update()
+    this.update()
 
     return spinner
   }
@@ -59,6 +62,21 @@ class MyProgress extends MultiBar {
       start(totV, stV, pl) {
         return { totV, stV, pl }
       },
+    }
+  }
+
+  update() {
+    super.update()
+    /** @type {Array<number>} */
+    const progs = []
+    this.bars
+      .slice(1)
+      .forEach((bar) => progs.push(Math.round((bar.value / bar.total) * 100)))
+
+    const min = Math.min(...progs)
+    if (min !== this.progress && Number.isFinite(min)) {
+      this.emit('progress', min)
+      this.progress = min
     }
   }
 }

@@ -17,12 +17,15 @@ declare const progressBar: MyProgress;
  */
 declare class MyProgress {
     constructor(opt: any, preset: any);
+    bars: any[];
     multimode: boolean;
+    progress: number;
     /**
      * @param {spOptions} spOptions
      */
     createSpinner(spOptions: spOptions): Spinner;
     isActive: boolean;
     create(total: any, startValue: any, payload: any): any;
+    update(): void;
 }
 import Spinner from "./spinner.mjs";

@@ -1,6 +1,6 @@
 {
   "name": "connector",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "src/controllers/utConnector/utConnector.mjs",
   "types": "src/controllers/utConnector/utConnector.d.mts",
