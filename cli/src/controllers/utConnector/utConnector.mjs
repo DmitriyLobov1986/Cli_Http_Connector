@@ -34,7 +34,7 @@ import timeout from '../abort/index.mjs'
 class UtConnector {
   /** @param {import('./types').Options} options параметры */
   constructor({ base, output, config = './config.json' }) {
-    this.multibar = progressBar
+    this.multibar = progressBar()
     this.bar = null
 
     // settings

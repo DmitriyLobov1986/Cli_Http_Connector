@@ -81,19 +81,21 @@ class MyProgress extends MultiBar {
   }
 }
 
-const progressBar = new MyProgress(
-  {
-    stopOnComplete: true,
-    clearOnComplete: true,
-    hideCursor: true,
-    format: `${colors.cyan(
-      '{message}'
-    )} [{bar}] {percentage}% | DUR: {duration}s | ${colors.green(
-      '{value}/{total}'
-    )} | '{details}'`,
-    fps: 5,
-  },
-  Presets.shades_grey
-)
+const progressBar = () => {
+  return new MyProgress(
+    {
+      stopOnComplete: true,
+      clearOnComplete: true,
+      hideCursor: true,
+      format: `${colors.cyan(
+        '{message}'
+      )} [{bar}] {percentage}% | DUR: {duration}s | ${colors.green(
+        '{value}/{total}'
+      )} | '{details}'`,
+      fps: 5,
+    },
+    Presets.shades_grey
+  )
+}
 
 export default progressBar
