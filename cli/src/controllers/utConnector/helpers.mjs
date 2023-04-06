@@ -21,11 +21,17 @@ const getQueryFields = (query) => {
 
   for (let index = blocks.length; index >= 1; index--) {
     blocks[index - 1]
-      .split('ИЗ')[0]
+      .split('ИЗ')
+      .shift()
       .split(',')
       .forEach((v) => {
-        const field = v.split('КАК')[1] ?? v.split('.').slice(1).join()
-        alias.push(field.replace(/[\s\r,.]/gi, ''))
+        const field = v.split('КАК').pop().split('.')
+        alias.push(
+          field
+            .slice(Math.min(1, field.length - 1))
+            .join()
+            .replace(/[\s\r,.]/gi, '')
+        )
       })
 
     if (alias.length) break

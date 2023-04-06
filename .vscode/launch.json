@@ -20,6 +20,22 @@
         "--params",
         "--loop=10"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "ut classic",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\cli/src/index.mjs",
+      "cwd": "${workspaceFolder}\\cli/src",
+      "console": "integratedTerminal",
+      "args": [
+        "import",
+        "C:/program/JS/connector/cli/src/files/sample2.ded",
+        "_sample",
+        "--q=\"C:/program/JS/connector/cli/src/files/query.txt\"",
+        "--base=ut"
+      ]
     }
   ]
 }
