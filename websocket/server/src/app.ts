@@ -4,7 +4,7 @@ import expressWs from 'express-ws'
 
 // **********controllers**********
 import { connHandler } from './controllers/connector.js'
-import { wsHandler } from './controllers/ws.js'
+import { wsHandler, getActiveUsers } from './controllers/ws.js'
 
 const app = express()
 const { app: appWs } = expressWs(app)
@@ -20,6 +20,9 @@ app.get('/', (req, res) => {
 
 // data route
 app.post('/connector', connHandler)
+
+// users route
+app.get('/users', getActiveUsers)
 
 // ws route
 appWs.ws('/ws', wsHandler)
