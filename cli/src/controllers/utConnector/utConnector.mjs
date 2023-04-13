@@ -9,7 +9,7 @@
 
 // system
 import { createWriteStream, readFileSync } from 'fs'
-import { Transform as TransformStream } from 'stream'
+import { Readable, Transform as TransformStream } from 'stream'
 import { pipeline } from 'node:stream/promises'
 
 // fetch
@@ -44,8 +44,7 @@ class UtConnector {
     this.url = settings.bases[base]
 
     // eslint-disable-next-line operator-linebreak
-    this.auth =
-      'Basic ' + Buffer.from(login + ':' + password).toString('base64')
+    this.auth = 'Basic ' + Buffer.from(login + ':' + password).toString('base64')
 
     this.output = output
   }
@@ -53,14 +52,18 @@ class UtConnector {
   /**
    * Пишем заголовок
    * @param {Array<string>} fields поля запроса
+   *@returns {Promise<void>}
    */
   #writeHeader(fields) {
     const writeStream = createWriteStream(this.output, { flags: 'a' })
+    const readStream = new Readable()
 
     const header = encoding.convert(fields.join('\t'), 'windows-1251')
 
-    writeStream.write(header)
-    writeStream.end()
+    readStream.push(header)
+    readStream.push(null)
+
+    return pipeline(readStream, writeStream)
   }
 
   /**
@@ -237,18 +240,15 @@ class UtConnector {
             this.#fetch(resolve, reject, params, cookieJar)
           })
 
-          await this.#writeResp(
-            response,
-            fileds,
-            f.toString().replace(/\r|\n/g, '')
-          )
+          await this.#writeResp(response, fileds, f.toString().replace(/\r|\n/g, ''))
           if (bar) bar.increment()
         })()
       )
     }
 
+    fetchArr.push(this.#writeHeader(fileds))
+
     try {
-      this.#writeHeader(fileds)
       await Promise.all(fetchArr)
       await cookieJar.saveCookies()
     } catch (err) {
