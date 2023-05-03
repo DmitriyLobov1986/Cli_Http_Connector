@@ -12,33 +12,37 @@ import Connector from 'connector'
 import { Request, Response } from 'express'
 import { IConnInterface } from './types/index.js'
 
-const connHandler = async (req: Request<{}, {}, IConnInterface>, res: Response) => {
-  let { base, query, params = [], output, config, user } = req.body
+const connHandler = (req: Request<{}, {}, IConnInterface>, res: Response, next: any) => {
+  let user = ''
 
-  // delete old file
-  if (existsSync(output)) {
-    await unlink(output)
-  }
+  ;(async function () {
+    let { base, query, params = [], output, config } = req.body
+    user = req.body.user
 
-  if (existsSync(query)) {
-    query = readFileSync(query, 'utf-8')
-  }
+    // delete old file
+    if (existsSync(output)) {
+      await unlink(output)
+    }
 
-  const conn = new Connector({ base, output, config })
+    if (existsSync(query)) {
+      query = readFileSync(query, 'utf-8')
+    }
 
-  conn.multibar.on('progress', (data: number | string) => {
-    wsSendMessage(String(data), user)
-  })
+    const conn = new Connector({ base, output, config })
 
-  conn
-    .getDataToCsv(query, params)
-    .then(() => {
-      res.send('query is ok')
-      wsSendMessage('query is ok', user)
+    conn.multibar.on('progress', (data: number | string) => {
+      wsSendMessage({ type: 'loading', payload: data }, user)
     })
-    .catch((err) => {
-      res.status(400)
-      res.end(err.message)
+
+    wsSendMessage({ type: 'start' }, user)
+
+    await conn.getDataToCsv(query, params).then(() => {
+      res.send('query is ok')
+    })
+  })()
+    .catch(next)
+    .finally(() => {
+      wsSendMessage({ type: 'finish' }, user)
     })
 }
 

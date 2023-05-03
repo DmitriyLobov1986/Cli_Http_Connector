@@ -14,6 +14,8 @@ export interface IUsers {
   ws: ws
 }
 
-export interface IQueryParams {
-  user: string
+ty
+export interface IMessage {
+  type: 'start' | 'loading' | 'finish'
+  payload?: string | number
 }

@@ -2,7 +2,7 @@ import { WebsocketRequestHandler } from 'express-ws'
 
 // **********types**********
 import { Request, Response } from 'express'
-import { IUsers } from './types/index.js'
+import { IUsers, IMessage } from './types/index.js'
 import ws from 'ws'
 
 // **********websocket clients**********
@@ -25,9 +25,9 @@ function wsDelClient(this: ws): void {
   wsClients = wsClients.filter((wsClient) => wsClient.ws !== this)
 }
 
-function wsSendMessage(ms: string, user: string): void {
+function wsSendMessage(ms: IMessage, user: string): void {
   wsClients.forEach((client: IUsers) => {
-    if (client.user === user) client.ws.send(JSON.stringify({ ms, user }))
+    if (client.user === user) client.ws.send(JSON.stringify({ ms }))
   })
 }
 
