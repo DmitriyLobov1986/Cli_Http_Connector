@@ -27,6 +27,6 @@ class MyAbortConroller {
   }
 }
 
-const controller = new MyAbortConroller()
+const setController = () => new MyAbortConroller()
 
-export default controller
+export default setController

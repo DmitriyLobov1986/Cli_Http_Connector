@@ -29,12 +29,13 @@ import * as utils from './helpers.mjs'
 import colors from 'ansi-colors'
 
 // timeout
-import timeout from '../abort/index.mjs'
+import setTimeout from '../abort/index.mjs'
 
 class UtConnector {
   /** @param {import('./types').Options} options параметры */
   constructor({ base, output, config = './config.json' }) {
     this.multibar = progressBar()
+    this.timeout = setTimeout()
     this.bar = null
 
     // settings
@@ -213,7 +214,7 @@ class UtConnector {
       this.multibar.multimode = false
     }
 
-    timeout.start(10)
+    this.timeout.start(10)
 
     // цикл по фильтрам
     const fetchArr = []
@@ -230,7 +231,7 @@ class UtConnector {
           Authorization: this.auth,
           IBSession: 'start',
         }),
-        signal: timeout.create(),
+        signal: this.timeout.create(),
       }
 
       fetchArr.push(
@@ -252,11 +253,11 @@ class UtConnector {
       await Promise.all(fetchArr)
       await cookieJar.saveCookies()
     } catch (err) {
-      timeout.abort()
+      this.timeout.abort()
       throw err
     } finally {
       this.multibar.stop()
-      timeout.stop()
+      this.timeout.stop()
     }
   }
 }

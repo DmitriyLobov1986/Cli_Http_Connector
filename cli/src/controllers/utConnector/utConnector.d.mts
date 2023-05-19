@@ -2,6 +2,9 @@ export default UtConnector
 declare class UtConnector {
   /** @param {import('./utConnector').Options} options параметры */
   constructor({ base, output }: import('./types.js').Options)
+  timeout: {
+    abort()
+  }
   multibar: {
     multimode: boolean
     createSpinner(
@@ -20,8 +23,5 @@ declare class UtConnector {
    * @param {string} query текст запроса
    * @param {import('./utConnector').qParams} qParams параметры запроса
    */
-  getDataToCsv(
-    query: string,
-    qParams: import('./types.js').qParams
-  ): Promise<void>
+  getDataToCsv(query: string, qParams: import('./types.js').qParams): Promise<void>
 }
