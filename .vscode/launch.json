@@ -10,7 +10,7 @@
       "name": "nodemon",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/websocket/server/node_modules/nodemon/bin/nodemon.js",
-      "args": ["src/app.ts"],
+      "args": ["app.ts"],
       "cwd": "${workspaceFolder}/websocket/server",
       "console": "integratedTerminal"
     }

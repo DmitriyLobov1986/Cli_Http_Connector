@@ -12,10 +12,19 @@ export interface IConnInterface {
 export interface IUsers {
   user: string
   ws: ws
+  loadings: Array<{
+    id: string
+    name: string
+    timeout: { abort(): void }
+  }>
 }
 
-ty
 export interface IMessage {
-  type: 'start' | 'loading' | 'finish'
-  payload?: string | number
+  id: string
+  data: { type: 'start' | 'loading' | 'finish'; name?: string; payload?: string | number }
+}
+
+export interface IMessageIN {
+  id: string
+  user: string
 }

@@ -1,21 +1,30 @@
+// **********system**********
+import * as url from 'url'
+
 // **********server**********
 import express from 'express'
 import expressWs from 'express-ws'
 
 // **********controllers**********
-import { connHandler } from './controllers/connector.js'
-import { wsHandler, getActiveUsers } from './controllers/ws.js'
+import { connHandler } from './src/controllers/connector.js'
+import { wsHandler, getActiveUsers } from './src/controllers/ws.js'
 
 const app = express()
 const { app: appWs } = expressWs(app)
 
 app.use(express.json())
 
+//static
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist'))
+
+//pug
+app.set('views', './src/views')
+app.set('view engine', 'pug')
+
 // ping route
 app.get('/', (req, res) => {
-  const ping = '<h4>ping is ok!!!!</h4>'
-  res.set('Content-Type', 'text/html')
-  res.end(ping)
+  res.render('ping')
 })
 
 // data route

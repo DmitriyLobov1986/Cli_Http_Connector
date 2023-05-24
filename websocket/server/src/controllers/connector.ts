@@ -1,9 +1,10 @@
 // **********node js**********
 import { existsSync, readFileSync } from 'node:fs'
+import { basename } from 'node:path'
 import { unlink } from 'node:fs/promises'
 
 // **********wsClients**********
-import { wsSendMessage } from './ws.js'
+import * as ws from './ws.js'
 
 // **********utConnector**********
 import Connector from 'connector'
@@ -14,10 +15,13 @@ import { IConnInterface } from './types/index.js'
 
 const connHandler = (req: Request<{}, {}, IConnInterface>, res: Response, next: any) => {
   let user = ''
+  let id = ''
 
   ;(async function () {
     let { base, query, params = [], output, config } = req.body
     user = req.body.user
+
+    const name = basename(output, '.csv')
 
     // delete old file
     if (existsSync(output)) {
@@ -30,11 +34,13 @@ const connHandler = (req: Request<{}, {}, IConnInterface>, res: Response, next: 
 
     const conn = new Connector({ base, output, config })
 
-    conn.multibar.on('progress', (data: number | string) => {
-      wsSendMessage({ type: 'loading', payload: data }, user)
-    })
+    id = ws.wsAddLoading(user, name, conn.timeout)
 
-    wsSendMessage({ type: 'start' }, user)
+    ws.wsSendMessage({ id, data: { type: 'start', name } }, user)
+
+    conn.multibar.on('progress', (data: number | string) => {
+      ws.wsSendMessage({ id, data: { type: 'loading', payload: data } }, user)
+    })
 
     await conn.getDataToCsv(query, params).then(() => {
       res.send('query is ok')
@@ -42,7 +48,7 @@ const connHandler = (req: Request<{}, {}, IConnInterface>, res: Response, next: 
   })()
     .catch(next)
     .finally(() => {
-      wsSendMessage({ type: 'finish' }, user)
+      ws.wsSendMessage({ id, data: { type: 'finish' } }, user)
     })
 }
 

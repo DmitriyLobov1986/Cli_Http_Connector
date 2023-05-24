@@ -1,0 +1,38 @@
+doctype html
+html(lang='')
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    title ping
+    link(rel="stylesheet" href="css/bootstrap.min.css")
+    
+     
+  - var users = ['user1', 'user2', 'user3']
+
+  body
+    .container.pt-3
+      table(class="table table-success table-striped table-hover table-bordered")
+        thead 
+          tr
+            th user 
+            th.text-center loadings
+        tbody
+          each client in clients
+            tr 
+              td.fw-bold.text-primary #{client.user}
+
+              - const loadings = client.loadings.map(loading => loading.name)              
+              td.fw-bold
+                each load in loadings
+                  button(type="button" class="btn btn-sm btn-secondary  mx-1")=load  
+          
+          else
+            tr
+              td.fw-bold.text-danger.text-center(colspan ="2") no users are connected!!!!!  
+
+
+          
+  script(language="javascript" src="js/bootstrap.min.js")
