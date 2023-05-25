@@ -1,5 +1,6 @@
 // **********system**********
-import * as url from 'url'
+import * as url from 'node:url'
+import * as path from 'node:path'
 
 // **********server**********
 import express from 'express'
@@ -16,7 +17,13 @@ app.use(express.json())
 
 //static
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
-app.use(express.static(__dirname + '/node_modules/bootstrap/dist'))
+
+const staticPath = [__dirname, '/node_modules/bootstrap/dist']
+if (process.env.NOD_ENV === 'production') {
+  staticPath.splice(1, 1, '..')
+}
+
+app.use(express.static(path.join(...staticPath)))
 
 //pug
 app.set('views', './src/views')
