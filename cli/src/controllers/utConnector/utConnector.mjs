@@ -11,6 +11,7 @@
 import { createWriteStream, readFileSync } from 'fs'
 import { Readable, Transform as TransformStream } from 'stream'
 import { pipeline } from 'node:stream/promises'
+import path from 'path'
 
 // fetch
 // eslint-disable-next-line no-unused-vars
@@ -30,6 +31,9 @@ import colors from 'ansi-colors'
 
 // timeout
 import setTimeout from '../abort/index.mjs'
+
+// logger
+import logger from '../logger/index.mjs'
 
 class UtConnector {
   /** @param {import('./types').Options} options параметры */
@@ -176,6 +180,17 @@ class UtConnector {
                 `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
               )
             )
+
+            // logger
+            const errorFile = path.join(path.dirname(this.output), 'error.log')
+            const queryBody = JSON.parse(params.body)
+            logger.logInFile(
+              'error',
+              `${queryBody.ТекстЗапроса}\n\n\n${JSON.stringify(
+                queryBody.ПараметрыЗапроса
+              )}`,
+              errorFile
+            )
           }
         }
       }
@@ -190,7 +205,7 @@ class UtConnector {
    * @param {import('./types').qParams} qParams параметры запроса
    */
   async getDataToCsv(query, qParams) {
-    const filtArr = utils.getQueryChunks(query)
+    const filtArr = utils.getQueryChunks(query, qParams)
     const fileds = utils.getQueryFields(query)
 
     // cookies
