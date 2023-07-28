@@ -6,12 +6,11 @@ import * as path from 'node:path'
 import express from 'express'
 import expressWs from 'express-ws'
 
-// **********controllers**********
-import { connHandler } from './src/controllers/connector.js'
-import { wsHandler, getActiveUsers } from './src/controllers/ws.js'
+// **********router**********
+import mountApiRouter from './src/routes/api.js'
 
 const app = express()
-const { app: appWs } = expressWs(app)
+expressWs(app)
 
 app.use(express.json())
 
@@ -29,19 +28,8 @@ app.use(express.static(path.join(...staticPath)))
 app.set('views', './src/views')
 app.set('view engine', 'pug')
 
-// ping route
-app.get('/', (req, res) => {
-  res.render('ping')
-})
-
-// data route
-app.post('/connector', connHandler)
-
-// users route
-app.get('/users', getActiveUsers)
-
-// ws route
-appWs.ws('/ws', wsHandler)
+//api
+app.use('/api', mountApiRouter())
 
 const PORT = 2000
 app.listen(PORT, '', () => {
