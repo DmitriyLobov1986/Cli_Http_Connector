@@ -43,13 +43,23 @@ const getQueryFields = (query) => {
 /**
  * Создаёт массив фильтров для паралелльных запросов
  * @param {string} query  текст запроса
+ * @param {import('./types').qParams} qParams параметры запроса
  * @returns {Array} массив фильтров
  */
-const getQueryChunks = (query) => {
+const getQueryChunks = (query, qParams) => {
   if (!query.includes('&loop')) return ['']
 
-  // read and convert
-  const loop = path.join(path.dirname(argv.path), 'ut', 'loop.csv')
+  // check loop in qParams
+  let loop = lodash.find(qParams, (o) => o.Имя === 'loop')
+  if (loop) {
+    return lodash.chunk(
+      loop.Значение.value.map((v) => `"${v}"`),
+      loop.Значение.size
+    )
+  }
+
+  // check loop in file
+  loop = path.join(path.dirname(argv.path), 'ut', 'loop.csv')
   const buffer = readFileSync(loop)
 
   return lodash.chunk(
