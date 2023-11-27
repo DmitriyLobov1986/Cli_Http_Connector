@@ -79,23 +79,23 @@ const getQueryChunks = (query, qParams) => {
  * @param {object} item
  * @returns {object} отформотированный объект
  */
-const customTransform = (item) => {
+const dateTransform = (item) => {
   const modArr = Object.entries(item).map(([k, v]) => {
-    if (typeof v !== 'string') {
-      return [k, v]
-    }
+    // if (typeof v !== 'string') {
+    //   return [k, v]
+    // }
 
-    const transValue = v
-      // .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
-      .replace(/[\r\n\t]/g, '')
-      .replace(new RegExp(String.fromCharCode(160), 'g'), '')
-      .replace(/^Да$/, 'true')
-      .replace(/^Нет$/, 'false')
-    const day = moment(transValue, 'YYYY-MM-DDTHH:mm:ss', true)
-    return [k, day.isValid() ? day.format('DD.MM.YYYY') : transValue]
+    // const transValue = v
+    //   // .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
+    //   .replace(/[\r\n\t]/g, '')
+    //   .replace(new RegExp(String.fromCharCode(160), 'g'), '')
+    //   .replace(/^Да$/, 'true')
+    //   .replace(/^Нет$/, 'false')
+    const day = moment(v, 'YYYY-MM-DDTHH:mm:ss', true)
+    return [k, day.isValid() ? day.format('DD.MM.YYYY') : v]
   })
 
   return Object.fromEntries(modArr)
 }
 
-export { getQueryChunks, customTransform, getQueryFields }
+export { getQueryChunks, dateTransform, getQueryFields }

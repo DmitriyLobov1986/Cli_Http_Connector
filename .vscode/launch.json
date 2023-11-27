@@ -38,6 +38,22 @@
         "--params",
         "--loop=2"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "gls",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\cli/src/index.mjs",
+      "cwd": "${workspaceFolder}\\cli/src",
+      "console": "integratedTerminal",
+      "args": [
+        "import",
+        "C:/progs/JS/connector/cli/src/files/sample2.ded",
+        "_sample_gls",
+        "--q=\"C:/progs/JS/connector/cli/src/files/query_test3.txt\"",
+        "--base=gls"
+      ]
     }
   ]
 }

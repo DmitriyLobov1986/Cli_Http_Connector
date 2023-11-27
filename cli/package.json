@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "cd src && node --inspect  index.mjs import \"C:/program/JS/connector/cli/src/files/sample2.ded\" _sample --q=\"C:/program/JS/connector/cli/src/files/query.txt\" --params --loop=10  ",
-    "pkg": "npm run build && pkg -t win src/bundle.js --output src/utConnector.exe",
+    "pkg": "npm run build && pkg -t win src/bundle.js --output src/utConnector.exe && rm src/bundle.js",
     "caxa": "caxa --input . --output src/utConnector.exe -- {{caxa}}/node_modules/.bin/node {{caxa}}/src/index.mjs",
     "lint": "npx eslint src/**/*.{js,jsx,mjs}",
     "build": "esbuild src/index.mjs --bundle --minify --platform=node --outfile=src/bundle.js"

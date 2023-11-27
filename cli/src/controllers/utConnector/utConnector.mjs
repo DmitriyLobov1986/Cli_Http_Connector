@@ -20,7 +20,10 @@ import CookiJar from './cookies.mjs'
 
 // transform
 import { AsyncParser } from '@json2csv/node'
-import { stringQuoteOnlyIfNecessary as stringQuoteOnlyIfNecessaryFormatter } from '@json2csv/formatters'
+import {
+  stringQuoteOnlyIfNecessary as stringQuoteOnlyIfNecessaryFormatter,
+  number as numberFormatter,
+} from '@json2csv/formatters'
 import bigJson from 'big-json'
 
 // utils
@@ -44,6 +47,7 @@ class UtConnector {
     this.multibar = progressBar()
     this.timeout = setTimeout()
     this.bar = null
+    this.header = null
 
     // settings
     const settings = rc('cli', JSON.parse(readFileSync(config, 'utf-8')))
@@ -76,10 +80,9 @@ class UtConnector {
   /**
    * Парсим данные ответа в csv файл
    * @param {Response} response fetch response
-   * @param {Array<string>} fields query fields
    * @param {String} barMessage
    */
-  async #writeResp(response, fields, barMessage) {
+  async #writeResp(response, barMessage) {
     const responseSize = +response.headers.get('Content-Length')
 
     // progress-bar
@@ -94,20 +97,23 @@ class UtConnector {
       {
         delimiter: '\t',
         doubleQuote: 'quote',
-        header: false,
-        fields,
-        transforms: [utils.customTransform],
+        header: this.header,
+        // fields,
+        transforms: [utils.dateTransform],
         formatters: {
           string: stringQuoteOnlyIfNecessaryFormatter({ quote: '' }),
+          number: numberFormatter({ separator: ',' }),
         },
       },
       {}
     )
 
+    this.header = false
+
     const transform = new TransformStream({
       transform(chunk, enc, done) {
         const dataConvert = encoding.convert(
-          '\r\n' + chunk.toString().replace(/[\r\n]/g, ''),
+          chunk.toString().replace(/[\r\n]/g, '') + '\r\n',
           'windows-1251',
           'utf-8'
         )
@@ -208,11 +214,14 @@ class UtConnector {
    */
   async getDataToCsv(query, qParams) {
     const filtArr = utils.getQueryChunks(query, qParams)
-    const fileds = utils.getQueryFields(query)
+    // const fileds = utils.getQueryFields(query)
 
     // cookies
     const cookieJar = new CookiJar(this.output)
     await cookieJar.loadCookies()
+
+    // header
+    this.header = true
 
     // spinner
     this.multibar.createSpinner({
@@ -258,13 +267,13 @@ class UtConnector {
             this.#fetch(resolve, reject, params, cookieJar)
           })
 
-          await this.#writeResp(response, fileds, f.toString().replace(/\r|\n/g, ''))
+          await this.#writeResp(response, f.toString().replace(/\r|\n/g, ''))
           if (bar) bar.increment()
         })()
       )
     }
 
-    fetchArr.push(this.#writeHeader(fileds))
+    // fetchArr.push(this.#writeHeader(fileds))
 
     try {
       await Promise.all(fetchArr)
