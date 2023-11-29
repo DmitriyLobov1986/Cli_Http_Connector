@@ -31,10 +31,12 @@
       "console": "integratedTerminal",
       "args": [
         "import",
-        "C:/program/JS/connector/cli/src/files/sample2.ded",
+        "C:/progs/JS/connector/cli/src/files/sample2.ded",
         "_sample",
-        "--q=\"C:/program/JS/connector/cli/src/files/query.txt\"",
-        "--base=ut"
+        "--q=\"C:/progs/JS/connector/cli/src/files/query_test.txt\"",
+        "--base=utOlap",
+        "--params",
+        "--loop=2"
       ]
     }
   ]

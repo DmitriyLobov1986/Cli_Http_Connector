@@ -1,8 +1,6 @@
 **/node_modules
 **/files
 **/build
+/websocket
 
-
-# output files
-#/src/files
-#src/bundle.js
+**/src/.clirc

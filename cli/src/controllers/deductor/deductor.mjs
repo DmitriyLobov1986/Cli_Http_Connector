@@ -27,7 +27,7 @@ class Deductor {
     // Настройки
     const path = resolve(cwd(), 'config.json')
     const jsonString = readFileSync(path, 'utf8')
-    this.meta = JSON.parse(jsonString)
+    this.meta = JSON.parse(jsonString).meta
 
     this.scenar = null
   }
@@ -45,9 +45,7 @@ class Deductor {
 
     // разархивирование
     await execProm(
-      `"C:/Program Files/WinRAR/WinRAR.exe" x -o+ -ad "${path}" "${dirname(
-        path
-      )}"`
+      `"C:/Program Files/WinRAR/WinRAR.exe" x -o+ -ad "${path}" "${dirname(path)}"`
     )
 
     // чтение и (затем) удаление копии сценария
@@ -76,9 +74,7 @@ class Deductor {
       const column = columns[col][0]
 
       // для лога истории имен и типов полей
-      history.push(
-        `${column.DisplayName[0]}  ${column.Name[0]}   ${column.DataType[0]}`
-      )
+      history.push(`${column.DisplayName[0]}  ${column.Name[0]}   ${column.DataType[0]}`)
 
       const { name, alias, dataType } = getFieldsData(
         column.DisplayName[0],
@@ -95,10 +91,7 @@ class Deductor {
 
     // Источник
     const sourceArr = component.RootAttributeName[0].split('.')
-    const source = `${this.meta[sourceArr[1]]}.${sourceArr[2].replace(
-      '#',
-      '.'
-    )}`
+    const source = `${this.meta[sourceArr[1]]}.${sourceArr[2].replace('#', '.')}`
 
     // Фильтр
     let filter = component.Filter[0].QyeryText?.[0]
@@ -121,9 +114,7 @@ class Deductor {
     )
 
     // Результат
-    return `ВЫБРАТЬ \n ${fields.join(',\n')} \n ИЗ ${source}${params} \n ${
-      filter ?? ''
-    }`
+    return `ВЫБРАТЬ \n ${fields.join(',\n')} \n ИЗ ${source}${params} \n ${filter ?? ''}`
   }
 
   #getVirtParams(paramsObj) {

@@ -1,15 +1,32 @@
 {
-  "Документы": "Документ",
-  "Справочники": "Справочник",
-  "Регистры сведений": "РегистрСведений",
-  "Регистры накопления": "РегистрНакопления",
-  "rptV8Record": "Запись",
-  "rptV8Period": "Период",
-  "dtDateTime": "Дата",
-  "dtFloat": "Число",
+  "meta": {
+    "Документы": "Документ",
+    "Справочники": "Справочник",
+    "Регистры сведений": "РегистрСведений",
+    "Регистры накопления": "РегистрНакопления",
+    "rptV8Record": "Запись",
+    "rptV8Period": "Период",
+    "dtDateTime": "Дата",
+    "dtFloat": "Число"
+  },
+
   "bases": {
-    "ut": "http://ut11-roz.pochtavip.com//ut11-roz/hs/reports/report",
-    "utOlap": "http://10.10.235.26/ut11-roz-olap/hs/reports/report",
-    "gls": "http://16X-DEDUCTOR01.one.local/gls/hs/internalapi/controller_gls/executeRequest"
+    "ut": {
+      "url": "http://ut11-roz.pochtavip.com//ut11-roz/hs/internalapi/request_Loginom/executeRequestDeductor",
+      "auth": "",
+      "alias": "Торговля"
+    },
+
+    "utOlap": {
+      "url": "http://10.10.235.26/ut11-roz-olap/hs/internalapi/request_Loginom/executeRequestDeductor",
+      "auth": "",
+      "alias": "ТорговляOlap"
+    },
+
+    "gls": {
+      "url": "http://10.10.235.30/zakupki/hs/internalapi/requestAPI/executeRequest",
+      "auth": "",
+      "alias": "Закупки"
+    }
   }
 }

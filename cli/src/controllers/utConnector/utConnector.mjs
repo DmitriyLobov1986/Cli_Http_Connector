@@ -35,6 +35,9 @@ import setTimeout from '../abort/index.mjs'
 // logger
 import logger from '../logger/index.mjs'
 
+// rc
+import rc from 'rc'
+
 class UtConnector {
   /** @param {import('./types').Options} options параметры */
   constructor({ base, output, config = './config.json' }) {
@@ -43,13 +46,12 @@ class UtConnector {
     this.bar = null
 
     // settings
-    const settings = JSON.parse(readFileSync(config, 'utf-8'))
-    const login = 'Deductor'
-    const password = 'Kj,jdLV1880'
-    this.url = settings.bases[base]
+    const settings = rc('cli', JSON.parse(readFileSync(config, 'utf-8')))
+    this.app = settings.bases[base]
 
     // eslint-disable-next-line operator-linebreak
-    this.auth = 'Basic ' + Buffer.from(login + ':' + password).toString('base64')
+    // this.auth = this.app.auth
+    // this.auth = 'Basic ' + Buffer.from(login + ':' + password).toString('base64')
 
     this.output = output
   }
@@ -151,7 +153,7 @@ class UtConnector {
   async #fetch(...args) {
     const [resolve, reject, params, cookieJar, tm] = args
 
-    const response = await fetch(cookieJar, this.url, params).catch((err) => {
+    const response = await fetch(cookieJar, this.app.url, params).catch((err) => {
       reject(err)
     })
 
@@ -243,7 +245,7 @@ class UtConnector {
         method: 'post',
         body: JSON.stringify(body),
         headers: new Headers({
-          Authorization: this.auth,
+          Authorization: this.app.auth,
           IBSession: 'start',
         }),
         signal: this.timeout.create(),
