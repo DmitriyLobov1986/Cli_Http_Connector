@@ -232,8 +232,8 @@ class UtConnector {
 
     // bar
     let bar = null
-    if (filtArr.length > 10) {
-      bar = this.multibar.create(filtArr.length, 0, {
+    if (filtArr.size > 10) {
+      bar = this.multibar.create(filtArr.size, 0, {
         message: 'Обработка пакета',
         details: 'запись данных!!!!',
       })
@@ -247,7 +247,7 @@ class UtConnector {
 
     for (const f of filtArr) {
       const body = {
-        ТекстЗапроса: query.replace('&loop', f),
+        ТекстЗапроса: f[0],
         ПараметрыЗапроса: qParams,
       }
       const params = {
@@ -267,7 +267,7 @@ class UtConnector {
             this.#fetch(resolve, reject, params, cookieJar)
           })
 
-          await this.#writeResp(response, f.toString().replace(/\r|\n/g, ''))
+          await this.#writeResp(response, f[1].toString())
           if (bar) bar.increment()
         })()
       )

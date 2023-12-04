@@ -21,19 +21,10 @@ const argv = yargs
         alias: 'qParams',
         describe: 'query params',
       })
-      .option('loop', {
-        describe: 'chunk size',
-        type: 'number',
-        default: 2,
-      })
       .option('base', {
         describe: 'loading base',
         type: 'string',
         default: 'utOlap',
-      })
-      .option('session', {
-        describe: 'use cookie IBSession ',
-        type: 'boolean',
       })
   })
   .version(false)

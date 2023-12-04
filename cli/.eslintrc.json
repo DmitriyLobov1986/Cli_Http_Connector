@@ -16,6 +16,7 @@
     "comma-dangle": ["error", "only-multiline"],
     "no-param-reassign": ["off"],
     "no-plusplus": "off",
-    "object-curly-newline": ["off"]
+    "object-curly-newline": ["off"],
+    "no-restricted-syntax": "off"
   }
 }

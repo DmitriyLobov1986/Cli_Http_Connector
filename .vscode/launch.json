@@ -7,23 +7,6 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "ut loop",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}\\cli/src/index.mjs",
-      "cwd": "${workspaceFolder}\\cli/src",
-      "console": "integratedTerminal",
-      "args": [
-        "import",
-        "C:/progs/JS/connector/cli/src/files/sample2.ded",
-        "_sample",
-        "--q=\"C:/progs/JS/connector/cli/src/files/query_test3.txt\"",
-        "--base=ut",
-        "--params=[{\"Имя\":\"loop\",\"Тип\":\"Строка\",\"Значение\":{\"value\":[\"EUR\",\"USD\"],\"size\":2}}]"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
       "name": "ut classic",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}\\cli/src/index.mjs",
@@ -35,10 +18,27 @@
         "_sample",
         "--q=\"C:/progs/JS/connector/cli/src/files/query_test.txt\"",
         "--base=utOlap",
-        "--params",
-        "--loop=2"
+        "--params"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "ut group",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\cli/src/index.mjs",
+      "cwd": "${workspaceFolder}\\cli/src",
+      "console": "integratedTerminal",
+      "args": [
+        "import",
+        "C:/progs/JS/connector/cli/src/files/sample2.ded",
+        "lp_groups",
+        "--q=\"C:/progs/JS/connector/cli/src/files/query_test_group.txt\"",
+        "--base=ut",
+        "--params"
+      ]
+    },
+
     {
       "type": "node",
       "request": "launch",

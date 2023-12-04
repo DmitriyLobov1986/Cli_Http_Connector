@@ -41,37 +41,89 @@ const getQueryFields = (query) => {
 }
 
 /**
- * Создаёт массив фильтров для паралелльных запросов
- * @param {string} query  текст запроса
- * @param {import('./types').qParams} qParams параметры запроса
- * @returns {Array} массив фильтров
+ * divide content in chunks by rows
+ * @param {string} filePath file path
+ * @param {number} size rows in one chunk
+ * @param {string} delimiter
+ * @returns {Array<string>}
  */
-const getQueryChunks = (query, qParams) => {
-  if (!query.includes('&loop')) return ['']
-
-  // check loop in qParams
-  let loop = lodash.find(qParams, (o) => o.Имя === 'loop')
-  if (loop) {
-    return lodash.chunk(
-      loop.Значение.value.map((v) => `"${v}"`),
-      loop.Значение.size
-    )
-  }
-
-  // check loop in file
-  loop = path.join(path.dirname(argv.path), 'ut', 'loop.csv')
-  const buffer = readFileSync(loop)
-
+const readFileToChunks = (filePath, size, delimiter = '\r\n') => {
+  const buffer = readFileSync(filePath)
   return lodash.chunk(
     encoding
       .convert(buffer, 'utf-8', 'windows-1251')
       .toString()
-      .split('\r\n')
-      .slice(1)
-      .map((v) => `"${v}"`),
-
-    argv.loop
+      .split(delimiter)
+      .slice(1, -1),
+    size
   )
+}
+
+/**
+ * Создаёт карту фильтров для паралелльных запросов (ключ - запрос, значение - массив параметров)
+ * @param {string} query  текст запроса
+ * @returns {Map} карта фильтров
+ */
+const getQueryChunks = (query) => {
+  let queryMap = new Map()
+  queryMap.set(query, [])
+
+  // multiload pattern
+  const multiPatrn = /(?<=@)(lp_.+?)_(set|val)_(\d+)_(\d+)(?=@)/g
+  const result = query.matchAll(multiPatrn)
+
+  // unique files
+  const files = new Map()
+  for (const file of result) {
+    const chunk = file[2] === 'set' ? +file[3] : 1
+    const key = `${file[1]}_${chunk}`
+
+    let fileData = files.get(key)
+    if (!fileData) {
+      fileData = new Set()
+      files.set(key, fileData)
+    }
+    fileData.add(file[1])
+    fileData.add(file[2])
+    fileData.add(chunk)
+    fileData.add(file[4])
+  }
+
+  // unique queries
+  files.forEach((value) => {
+    const [name, type, chunk, ...fields] = [...value]
+    const filePath = path.join(path.dirname(argv.path), 'ut', `${name}.csv`)
+    const res = readFileToChunks(filePath, chunk)
+
+    const setQueryArr = (queryExp, prms, acc) => {
+      res.forEach((line) => {
+        let queryMod = queryExp
+        const queryModPrms = [...prms]
+        let repl = ''
+
+        for (const field of fields) {
+          const pattern = `@${name}_${type}_${chunk}_${field}@`
+          switch (type) {
+            case 'set':
+              repl = line.map((str) => str.split('\t')[+field - 1])
+              break
+            default:
+              repl = line[0].split('\t')[[+field - 1]]
+              break
+          }
+          queryMod = queryMod.replaceAll(pattern, repl)
+          queryModPrms.push(repl)
+        }
+        acc.set(queryMod, queryModPrms)
+      })
+    }
+
+    const acc = new Map()
+    queryMap.forEach((prms, q) => setQueryArr(q, prms, acc))
+    queryMap = acc
+  })
+
+  return queryMap
 }
 
 /**
