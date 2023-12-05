@@ -12,19 +12,23 @@
 
   "bases": {
     "ut": {
-      "url": "http://ut11-roz.pochtavip.com//ut11-roz/hs/internalapi/request_Loginom/executeRequestDeductor",
+      "url": [
+        "http://ut11-roz.pochtavip.com//ut11-roz/hs/internalapi/request_Loginom/executeRequestDeductor"
+      ],
       "auth": "",
       "alias": "Торговля"
     },
 
     "utOlap": {
-      "url": "http://10.10.235.26/ut11-roz-olap/hs/internalapi/request_Loginom/executeRequestDeductor",
+      "url": [
+        "http://10.10.235.26/ut11-roz-olap/hs/internalapi/request_Loginom/executeRequestDedctor"
+      ],
       "auth": "",
       "alias": "ТорговляOlap"
     },
 
     "gls": {
-      "url": "http://10.10.235.30/zakupki/hs/internalapi/requestAPI/executeRequest",
+      "url": ["http://10.10.235.30/zakupki/hs/internalapi/requestAPI/executeRequest"],
       "auth": "",
       "alias": "Закупки"
     }

@@ -17,7 +17,6 @@
         "C:/progs/JS/connector/cli/src/files/sample2.ded",
         "_sample",
         "--q=\"C:/progs/JS/connector/cli/src/files/query_test.txt\"",
-        "--base=utOlap",
         "--params"
       ]
     },
@@ -34,7 +33,6 @@
         "C:/progs/JS/connector/cli/src/files/sample2.ded",
         "lp_groups",
         "--q=\"C:/progs/JS/connector/cli/src/files/query_test_group.txt\"",
-        "--base=ut",
         "--params"
       ]
     },

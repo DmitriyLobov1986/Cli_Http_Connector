@@ -8,15 +8,14 @@
 // #endregion
 
 // system
-import { createWriteStream, readFileSync } from 'fs'
+import { createWriteStream } from 'fs'
 import { Readable, Transform as TransformStream } from 'stream'
 import { pipeline } from 'node:stream/promises'
 import path from 'path'
 
 // fetch
 // eslint-disable-next-line no-unused-vars
-import { fetch, Headers, Response } from 'node-fetch-cookies'
-import CookiJar from './cookies.mjs'
+import fetch, { Headers, Response } from 'node-fetch'
 
 // transform
 import { AsyncParser } from '@json2csv/node'
@@ -33,29 +32,22 @@ import * as utils from './helpers.mjs'
 import colors from 'ansi-colors'
 
 // timeout
-import setTimeout from '../abort/index.mjs'
+import setAbortTimeout from '../abort/index.mjs'
 
 // logger
 import logger from '../logger/index.mjs'
 
-// rc
-import rc from 'rc'
-
+// app settings
+import { getApp } from './settings/index.mjs'
 class UtConnector {
   /** @param {import('./types').Options} options параметры */
   constructor({ base, output, config = './config.json' }) {
     this.multibar = progressBar()
-    this.timeout = setTimeout()
+    this.timeout = setAbortTimeout()
     this.bar = null
     this.header = null
 
-    // settings
-    const settings = rc('cli', JSON.parse(readFileSync(config, 'utf-8')))
-    this.app = settings.bases[base]
-
-    // eslint-disable-next-line operator-linebreak
-    // this.auth = this.app.auth
-    // this.auth = 'Basic ' + Buffer.from(login + ':' + password).toString('base64')
+    this.app = getApp(base, config)
 
     this.output = output
   }
@@ -157,49 +149,52 @@ class UtConnector {
   }
 
   async #fetch(...args) {
-    const [resolve, reject, params, cookieJar, tm] = args
+    const [resolve, reject, params] = args
 
-    const response = await fetch(cookieJar, this.app.url, params).catch((err) => {
+    const url = this.app.url
+    const response = await fetch(url, params).catch((err) => {
       reject(err)
     })
 
-    const refresh = (self) => {
-      if (tm) clearTimeout(tm)
-      const timer = setTimeout(() => {
-        self.#fetch(resolve, reject, params, cookieJar, timer)
-      }, 4000)
+    const refresh = () => {
+      setTimeout(this.#fetch.bind(this, resolve, reject, params), 5000)
     }
 
     if (!response) return
     if (!response.ok) {
       switch (response.status) {
         case 406: {
-          refresh(this)
+          refresh()
           break
         }
+
         default: {
           const errorMessage = await response.text()
-          if (errorMessage.includes('Сеанс отсутствует')) {
-            cookieJar.cookies.clear()
-            refresh(this)
-          } else {
-            reject(
-              new Error(
-                `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
-              )
-            )
 
-            // logger
-            const errorFile = path.join(path.dirname(this.output), 'error.log')
-            const queryBody = JSON.parse(params.body)
-            logger.logInFile(
-              'error',
-              `${queryBody.ТекстЗапроса}\n\n\n${JSON.stringify(
-                queryBody.ПараметрыЗапроса
-              )}`,
-              errorFile
-            )
+          if (!errorMessage.includes('ТекстОшибки')) {
+            this.app.switchUrl(errorMessage)
+            if (url !== this.app.url) {
+              refresh()
+              return
+            }
           }
+
+          reject(
+            new Error(
+              `HTTP Error Response: ${errorMessage} \n ${response.status} ${response.statusText}`
+            )
+          )
+
+          // logger
+          const errorFile = path.join(path.dirname(this.output), 'error.log')
+          const queryBody = JSON.parse(params.body)
+          logger.logInFile(
+            'error',
+            `${queryBody.ТекстЗапроса}\n${JSON.stringify(
+              queryBody.ПараметрыЗапроса
+            )}\n\n${errorMessage}`,
+            errorFile
+          )
         }
       }
     } else {
@@ -214,11 +209,6 @@ class UtConnector {
    */
   async getDataToCsv(query, qParams) {
     const filtArr = utils.getQueryChunks(query, qParams)
-    // const fileds = utils.getQueryFields(query)
-
-    // cookies
-    const cookieJar = new CookiJar(this.output)
-    await cookieJar.loadCookies()
 
     // header
     this.header = true
@@ -264,7 +254,7 @@ class UtConnector {
         // eslint-disable-next-line no-loop-func
         (async () => {
           const response = await new Promise((resolve, reject) => {
-            this.#fetch(resolve, reject, params, cookieJar)
+            this.#fetch(resolve, reject, params)
           })
 
           await this.#writeResp(response, f[1].toString())
@@ -273,11 +263,8 @@ class UtConnector {
       )
     }
 
-    // fetchArr.push(this.#writeHeader(fileds))
-
     try {
       await Promise.all(fetchArr)
-      await cookieJar.saveCookies()
     } catch (err) {
       this.timeout.abort()
       throw err
