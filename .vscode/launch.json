@@ -49,7 +49,7 @@
         "import",
         "C:/progs/JS/connector/cli/src/files/sample2.ded",
         "_sample_gls",
-        "--q=\"C:/progs/JS/connector/cli/src/files/query_test3.txt\"",
+        "--q=\"C:/progs/JS/connector/cli/src/files/query_test_gls.txt\"",
         "--base=gls"
       ]
     }

@@ -126,28 +126,13 @@ const getQueryChunks = (query) => {
   return queryMap
 }
 
-/**
- * Форматирует значения полей объекта
- * @param {object} item
- * @returns {object} отформотированный объект
- */
-const dateTransform = (item) => {
-  const modArr = Object.entries(item).map(([k, v]) => {
-    // if (typeof v !== 'string') {
-    //   return [k, v]
-    // }
-
-    // const transValue = v
-    //   // .replace(/(?<=^\r\n)"|^"|"$|(?<=.)[\r\n]/g, '')
-    //   .replace(/[\r\n\t]/g, '')
-    //   .replace(new RegExp(String.fromCharCode(160), 'g'), '')
-    //   .replace(/^Да$/, 'true')
-    //   .replace(/^Нет$/, 'false')
-    const day = moment(v, 'YYYY-MM-DDTHH:mm:ss', true)
-    return [k, day.isValid() ? day.format('DD.MM.YYYY') : v]
-  })
-
-  return Object.fromEntries(modArr)
+// #region formatters
+const customStringFormatter = (item) => {
+  const itemMod = item.replace(/\t/g, '_')
+  const day = moment(itemMod, 'YYYY-MM-DDTHH:mm:ss', true)
+  return day.isValid() ? day.format('DD.MM.YYYY') : itemMod
 }
 
-export { getQueryChunks, dateTransform, getQueryFields }
+// #endregion
+
+export { getQueryChunks, customStringFormatter, getQueryFields }

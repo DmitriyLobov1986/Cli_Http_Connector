@@ -9,7 +9,7 @@
 
 // system
 import { createWriteStream } from 'fs'
-import { Readable, Transform as TransformStream } from 'stream'
+import { Transform as TransformStream } from 'stream'
 import { pipeline } from 'node:stream/promises'
 import path from 'path'
 
@@ -19,10 +19,7 @@ import fetch, { Headers, Response } from 'node-fetch'
 
 // transform
 import { AsyncParser } from '@json2csv/node'
-import {
-  stringQuoteOnlyIfNecessary as stringQuoteOnlyIfNecessaryFormatter,
-  number as numberFormatter,
-} from '@json2csv/formatters'
+import { number as numberFormatter } from '@json2csv/formatters'
 import bigJson from 'big-json'
 
 // utils
@@ -53,23 +50,6 @@ class UtConnector {
   }
 
   /**
-   * Пишем заголовок
-   * @param {Array<string>} fields поля запроса
-   *@returns {Promise<void>}
-   */
-  #writeHeader(fields) {
-    const writeStream = createWriteStream(this.output, { flags: 'a' })
-    const readStream = new Readable()
-
-    const header = encoding.convert(fields.join('\t'), 'windows-1251')
-
-    readStream.push(header)
-    readStream.push(null)
-
-    return pipeline(readStream, writeStream)
-  }
-
-  /**
    * Парсим данные ответа в csv файл
    * @param {Response} response fetch response
    * @param {String} barMessage
@@ -90,10 +70,9 @@ class UtConnector {
         delimiter: '\t',
         doubleQuote: 'quote',
         header: this.header,
-        // fields,
-        transforms: [utils.dateTransform],
         formatters: {
-          string: stringQuoteOnlyIfNecessaryFormatter({ quote: '' }),
+          string: utils.customStringFormatter,
+          // string: stringQuoteOnlyIfNecessaryFormatter({ quote: '' }),
           number: numberFormatter({ separator: ',' }),
         },
       },
